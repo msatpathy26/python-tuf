@@ -9,7 +9,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-from typing import Callable, ClassVar, List
+from typing import Callable, ClassVar
 from unittest.mock import MagicMock, patch
 
 from securesystemslib.signer import Signer
@@ -147,7 +147,7 @@ class TestUpdater(unittest.TestCase):
             )
         )
 
-    def _assert_files(self, roles: List[str]) -> None:
+    def _assert_files(self, roles: list[str]) -> None:
         """Assert that local metadata files exist for 'roles'"""
         expected_files = [f"{role}.json" for role in roles]
         client_files = sorted(os.listdir(self.client_directory))

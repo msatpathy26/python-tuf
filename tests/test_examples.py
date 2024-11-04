@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from typing import ClassVar, List
+from typing import ClassVar
 
 from tests import utils
 
@@ -44,7 +44,7 @@ class TestRepoExamples(unittest.TestCase):
         shutil.rmtree(self.base_test_dir)
 
     def _run_script_and_assert_files(
-        self, script_name: str, filenames_created: List[str]
+        self, script_name: str, filenames_created: list[str]
     ) -> None:
         """Run script in exmple dir and assert that it created the
         files corresponding to the passed filenames inside a 'tmp*' test dir at

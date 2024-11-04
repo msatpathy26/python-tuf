@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 from dataclasses import dataclass
-from typing import ClassVar, Dict, List, Optional, Type
+from typing import ClassVar, Optional
 
 from securesystemslib.signer import CryptoSigner, Signer
 
@@ -22,10 +22,10 @@ from tuf.ngclient import Updater
 
 @dataclass
 class MdVersion:
-    keys: List[int]
+    keys: list[int]
     threshold: int
-    sigs: List[int]
-    res: Optional[Type[Exception]] = None
+    sigs: list[int]
+    res: Optional[type[Exception]] = None
 
 
 class TestUpdaterKeyRotations(unittest.TestCase):
@@ -34,8 +34,8 @@ class TestUpdaterKeyRotations(unittest.TestCase):
     # set dump_dir to trigger repository state dumps
     dump_dir: Optional[str] = None
     temp_dir: ClassVar[tempfile.TemporaryDirectory]
-    keys: ClassVar[List[Key]]
-    signers: ClassVar[List[Signer]]
+    keys: ClassVar[list[Key]]
+    signers: ClassVar[list[Signer]]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -153,7 +153,7 @@ class TestUpdaterKeyRotations(unittest.TestCase):
     # fmt: on
 
     @run_sub_tests_with_dataset(root_rotation_cases)
-    def test_root_rotation(self, root_versions: List[MdVersion]) -> None:
+    def test_root_rotation(self, root_versions: list[MdVersion]) -> None:
         """Test Updater.refresh() with various sequences of root updates
 
         Each MdVersion in the list describes root keys and signatures of a
@@ -198,7 +198,7 @@ class TestUpdaterKeyRotations(unittest.TestCase):
             self.assertEqual(f.read(), expected_local_root)
 
     # fmt: off
-    non_root_rotation_cases: Dict[str, MdVersion] = {
+    non_root_rotation_cases: dict[str, MdVersion] = {
         "1-of-1 key rotation":
             MdVersion(keys=[2], threshold=1, sigs=[2]),
         "1-of-1 key rotation, unused signatures":

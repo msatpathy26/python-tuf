@@ -7,8 +7,9 @@
 import abc
 import logging
 import tempfile
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import IO, Iterator
+from typing import IO
 
 from tuf.api import exceptions
 

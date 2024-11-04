@@ -7,7 +7,7 @@ import copy
 import os
 import sys
 import unittest
-from typing import Any, ClassVar, Dict
+from typing import Any, ClassVar
 
 from securesystemslib.signer import SSlibKey
 
@@ -28,7 +28,7 @@ from tuf.api.metadata import (
 class TestMetadataComparisions(unittest.TestCase):
     """Test __eq__ for all classes inside tuf/api/metadata.py."""
 
-    metadata: ClassVar[Dict[str, bytes]]
+    metadata: ClassVar[dict[str, bytes]]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -85,7 +85,7 @@ class TestMetadataComparisions(unittest.TestCase):
     }
 
     @utils.run_sub_tests_with_dataset(classes_attributes_modifications)
-    def test_classes_eq_(self, test_case_data: Dict[str, Any]) -> None:
+    def test_classes_eq_(self, test_case_data: dict[str, Any]) -> None:
         obj = self.objects[self.case_name]
 
         # Assert that obj is not equal to an object from another type

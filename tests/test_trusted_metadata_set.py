@@ -5,7 +5,7 @@ import os
 import sys
 import unittest
 from datetime import datetime, timezone
-from typing import Callable, ClassVar, Dict, List, Optional, Tuple
+from typing import Callable, ClassVar, Optional
 
 from securesystemslib.signer import Signer
 
@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 class TestTrustedMetadataSet(unittest.TestCase):
     """Tests for all public API of the TrustedMetadataSet class."""
 
-    keystore: ClassVar[Dict[str, Signer]]
-    metadata: ClassVar[Dict[str, bytes]]
+    keystore: ClassVar[dict[str, Signer]]
+    metadata: ClassVar[dict[str, bytes]]
     repo_dir: ClassVar[str]
 
     @classmethod
@@ -232,7 +232,7 @@ class TestTrustedMetadataSet(unittest.TestCase):
             self.trusted_set.update_root(self.metadata[Snapshot.type])
 
     def test_top_level_md_with_invalid_json(self) -> None:
-        top_level_md: List[Tuple[bytes, Callable[[bytes], Signed]]] = [
+        top_level_md: list[tuple[bytes, Callable[[bytes], Signed]]] = [
             (self.metadata[Timestamp.type], self.trusted_set.update_timestamp),
             (self.metadata[Snapshot.type], self.trusted_set.update_snapshot),
             (self.metadata[Targets.type], self.trusted_set.update_targets),

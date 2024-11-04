@@ -64,7 +64,8 @@ Example of loading root, timestamp and snapshot:
 import datetime
 import logging
 from collections import abc
-from typing import Dict, Iterator, Optional, Tuple, Type, Union, cast
+from collections.abc import Iterator
+from typing import Optional, Union, cast
 
 from securesystemslib.signer import Signature
 
@@ -109,7 +110,7 @@ class TrustedMetadataSet(abc.Mapping):
             RepositoryError: Metadata failed to load or verify. The actual
                 error type and content will contain more details.
         """
-        self._trusted_set: Dict[str, Signed] = {}
+        self._trusted_set: dict[str, Signed] = {}
         self.reference_time = datetime.datetime.now(datetime.timezone.utc)
 
         if envelope_type is EnvelopeType.SIMPLE:
@@ -450,11 +451,11 @@ class TrustedMetadataSet(abc.Mapping):
 
 
 def _load_from_metadata(
-    role: Type[T],
+    role: type[T],
     data: bytes,
     delegator: Optional[Delegator] = None,
     role_name: Optional[str] = None,
-) -> Tuple[T, bytes, Dict[str, Signature]]:
+) -> tuple[T, bytes, dict[str, Signature]]:
     """Load traditional metadata bytes, and extract and verify payload.
 
     If no delegator is passed, verification is skipped. Returns a tuple of
@@ -477,11 +478,11 @@ def _load_from_metadata(
 
 
 def _load_from_simple_envelope(
-    role: Type[T],
+    role: type[T],
     data: bytes,
     delegator: Optional[Delegator] = None,
     role_name: Optional[str] = None,
-) -> Tuple[T, bytes, Dict[str, Signature]]:
+) -> tuple[T, bytes, dict[str, Signature]]:
     """Load simple envelope bytes, and extract and verify payload.
 
     If no delegator is passed, verification is skipped. Returns a tuple of

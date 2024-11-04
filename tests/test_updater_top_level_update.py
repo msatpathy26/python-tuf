@@ -9,8 +9,9 @@ import os
 import sys
 import tempfile
 import unittest
+from collections.abc import Iterable
 from datetime import timezone
-from typing import Iterable, Optional
+from typing import Optional
 from unittest.mock import MagicMock, call, patch
 
 import freezegun

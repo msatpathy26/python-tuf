@@ -42,7 +42,7 @@ import logging
 import os
 import shutil
 import tempfile
-from typing import Optional, Set, cast
+from typing import Optional, cast
 from urllib import parse
 
 from tuf.api import exceptions
@@ -430,7 +430,7 @@ class Updater:
         # List of delegations to be interrogated. A (role, parent role) pair
         # is needed to load and verify the delegated targets metadata.
         delegations_to_visit = [(Targets.type, Root.type)]
-        visited_role_names: Set[str] = set()
+        visited_role_names: set[str] = set()
 
         # Preorder depth-first traversal of the graph of target delegations.
         while (

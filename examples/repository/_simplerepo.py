@@ -8,7 +8,7 @@ import json
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Union
+from typing import Union
 
 from securesystemslib.signer import CryptoSigner, Key, Signer
 
@@ -59,16 +59,16 @@ class SimpleRepository(Repository):
 
     def __init__(self) -> None:
         # all versions of all metadata
-        self.role_cache: Dict[str, List[Metadata]] = defaultdict(list)
+        self.role_cache: dict[str, list[Metadata]] = defaultdict(list)
         # all current keys
-        self.signer_cache: Dict[str, List[Signer]] = defaultdict(list)
+        self.signer_cache: dict[str, list[Signer]] = defaultdict(list)
         # all target content
-        self.target_cache: Dict[str, bytes] = {}
+        self.target_cache: dict[str, bytes] = {}
         # version cache for snapshot and all targets, updated in close().
         # The 'defaultdict(lambda: ...)' trick allows close() to easily modify
         # the version without always creating a new MetaFile
         self._snapshot_info = MetaFile(1)
-        self._targets_infos: Dict[str, MetaFile] = defaultdict(
+        self._targets_infos: dict[str, MetaFile] = defaultdict(
             lambda: MetaFile(1)
         )
 
@@ -84,7 +84,7 @@ class SimpleRepository(Repository):
                 pass
 
     @property
-    def targets_infos(self) -> Dict[str, MetaFile]:
+    def targets_infos(self) -> dict[str, MetaFile]:
         return self._targets_infos
 
     @property

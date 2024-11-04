@@ -8,8 +8,9 @@ import os
 import sys
 import tempfile
 import unittest
+from collections.abc import Iterable
 from dataclasses import astuple, dataclass, field
-from typing import Iterable, List, Optional
+from typing import Optional
 
 from tests import utils
 from tests.repository_simulator import RepositorySimulator
@@ -27,11 +28,11 @@ from tuf.ngclient import Updater
 class TestDelegation:
     delegator: str
     rolename: str
-    keyids: List[str] = field(default_factory=list)
+    keyids: list[str] = field(default_factory=list)
     threshold: int = 1
     terminating: bool = False
-    paths: Optional[List[str]] = field(default_factory=lambda: ["*"])
-    path_hash_prefixes: Optional[List[str]] = None
+    paths: Optional[list[str]] = field(default_factory=lambda: ["*"])
+    path_hash_prefixes: Optional[list[str]] = None
 
 
 @dataclass
@@ -46,16 +47,16 @@ class DelegationsTestCase:
     """A delegations graph as lists of delegations and target files
     and the expected order of traversal as a list of role names."""
 
-    delegations: List[TestDelegation]
-    target_files: List[TestTarget] = field(default_factory=list)
-    visited_order: List[str] = field(default_factory=list)
+    delegations: list[TestDelegation]
+    target_files: list[TestTarget] = field(default_factory=list)
+    visited_order: list[str] = field(default_factory=list)
 
 
 @dataclass
 class TargetTestCase:
     targetpath: str
     found: bool
-    visited_order: List[str] = field(default_factory=list)
+    visited_order: list[str] = field(default_factory=list)
 
 
 class TestDelegations(unittest.TestCase):

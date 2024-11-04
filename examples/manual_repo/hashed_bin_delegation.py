@@ -19,9 +19,9 @@ NOTE: Metadata files will be written to a 'tmp*'-directory in CWD.
 import hashlib
 import os
 import tempfile
+from collections.abc import Iterator
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, Iterator, List, Tuple
 
 from securesystemslib.signer import CryptoSigner, Signer
 
@@ -42,8 +42,8 @@ def _in(days: float) -> datetime:
     )
 
 
-roles: Dict[str, Metadata[Targets]] = {}
-signers: Dict[str, Signer] = {}
+roles: dict[str, Metadata[Targets]] = {}
+signers: dict[str, Signer] = {}
 
 # Hash bin delegation
 # ===================
@@ -96,7 +96,7 @@ def _bin_name(low: int, high: int) -> str:
     return f"{low:0{PREFIX_LEN}x}-{high:0{PREFIX_LEN}x}"
 
 
-def generate_hash_bins() -> Iterator[Tuple[str, List[str]]]:
+def generate_hash_bins() -> Iterator[tuple[str, list[str]]]:
     """Returns generator for bin names and hash prefixes per bin."""
     # Iterate over the total number of hash prefixes in 'bin size'-steps to
     # generate bin names and a list of hash prefixes served by each bin.

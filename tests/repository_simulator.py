@@ -46,8 +46,9 @@ import datetime
 import logging
 import os
 import tempfile
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Optional
 from urllib import parse
 
 import securesystemslib.hash as sslib_hash
@@ -80,8 +81,8 @@ SPEC_VER = ".".join(SPECIFICATION_VERSION)
 class FetchTracker:
     """Fetcher counter for metadata and targets."""
 
-    metadata: List[Tuple[str, Optional[int]]] = field(default_factory=list)
-    targets: List[Tuple[str, Optional[str]]] = field(default_factory=list)
+    metadata: list[tuple[str, Optional[int]]] = field(default_factory=list)
+    targets: list[tuple[str, Optional[str]]] = field(default_factory=list)
 
 
 @dataclass
@@ -96,18 +97,18 @@ class RepositorySimulator(FetcherInterface):
     """Simulates a repository that can be used for testing."""
 
     def __init__(self) -> None:
-        self.md_delegates: Dict[str, Metadata[Targets]] = {}
+        self.md_delegates: dict[str, Metadata[Targets]] = {}
 
         # other metadata is signed on-demand (when fetched) but roots must be
         # explicitly published with publish_root() which maintains this list
-        self.signed_roots: List[bytes] = []
+        self.signed_roots: list[bytes] = []
 
         # signers are used on-demand at fetch time to sign metadata
         # keys are roles, values are dicts of {keyid: signer}
-        self.signers: Dict[str, Dict[str, Signer]] = {}
+        self.signers: dict[str, dict[str, Signer]] = {}
 
         # target downloads are served from this dict
-        self.target_files: Dict[str, RepositoryTarget] = {}
+        self.target_files: dict[str, RepositoryTarget] = {}
 
         # Whether to compute hashes and length for meta in snapshot/timestamp
         self.compute_metafile_hashes_length = False
@@ -143,7 +144,7 @@ class RepositorySimulator(FetcherInterface):
     def targets(self) -> Targets:
         return self.md_targets.signed
 
-    def all_targets(self) -> Iterator[Tuple[str, Targets]]:
+    def all_targets(self) -> Iterator[tuple[str, Targets]]:
         """Yield role name and signed portion of targets one by one."""
         yield Targets.type, self.md_targets.signed
         for role, md in self.md_delegates.items():
@@ -287,7 +288,7 @@ class RepositorySimulator(FetcherInterface):
 
     def _compute_hashes_and_length(
         self, role: str
-    ) -> Tuple[Dict[str, str], int]:
+    ) -> tuple[dict[str, str], int]:
         data = self.fetch_metadata(role)
         digest_object = sslib_hash.digest(sslib_hash.DEFAULT_HASH_ALGORITHM)
         digest_object.update(data)

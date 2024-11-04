@@ -30,8 +30,9 @@ import threading
 import time
 import unittest
 import warnings
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import IO, Any, Callable, Dict, Iterator, List, Optional
+from typing import IO, Any, Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ TESTS_DIR = os.path.dirname(os.path.realpath(__file__))
 TEST_HOST_ADDRESS = "127.0.0.1"
 
 # DataSet is only here so type hints can be used.
-DataSet = Dict[str, Any]
+DataSet = dict[str, Any]
 
 
 # Test runner decorator: Runs the test as a set of N SubTests,
@@ -131,7 +132,7 @@ def wait_for_server(
         )
 
 
-def configure_test_logging(argv: List[str]) -> None:
+def configure_test_logging(argv: list[str]) -> None:
     """Configure logger level for a certain test file"""
     # parse arguments but only handle '-v': argv may contain
     # other things meant for unittest argument parser
@@ -184,12 +185,12 @@ class TestServerProcess:
         server: str = os.path.join(TESTS_DIR, "simple_server.py"),
         timeout: int = 10,
         popen_cwd: str = ".",
-        extra_cmd_args: Optional[List[str]] = None,
+        extra_cmd_args: Optional[list[str]] = None,
     ):
         self.server = server
         self.__logger = log
         # Stores popped messages from the queue.
-        self.__logged_messages: List[str] = []
+        self.__logged_messages: list[str] = []
         self.__server_process: Optional[subprocess.Popen] = None
         self._log_queue: Optional[queue.Queue] = None
         self.port = -1
@@ -205,7 +206,7 @@ class TestServerProcess:
             raise e
 
     def _start_server(
-        self, timeout: int, extra_cmd_args: List[str], popen_cwd: str
+        self, timeout: int, extra_cmd_args: list[str], popen_cwd: str
     ) -> None:
         """
         Start the server subprocess and a thread
@@ -220,7 +221,7 @@ class TestServerProcess:
 
         self.__logger.info("%s serving on %d", self.server, self.port)
 
-    def _start_process(self, extra_cmd_args: List[str], popen_cwd: str) -> None:
+    def _start_process(self, extra_cmd_args: list[str], popen_cwd: str) -> None:
         """Starts the process running the server."""
 
         # The "-u" option forces stdin, stdout and stderr to be unbuffered.
