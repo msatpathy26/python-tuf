@@ -149,3 +149,13 @@ module = [
   "securesystemslib.*",
 ]
 ignore_missing_imports = "True"
+
+[tool.coverage.report]
+exclude_also = [
+    # abstract class method definition
+    "raise NotImplementedError",
+    # defensive programming: these cannot happen
+    "raise AssertionError",
+    # imports for mypy only
+    "if TYPE_CHECKING",
+]
