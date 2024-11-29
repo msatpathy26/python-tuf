@@ -10,7 +10,8 @@ library.
 # can be moved out of _internal once sigstore-python 1.0 is not relevant.
 
 import logging
-from typing import Dict, Iterator, Optional, Tuple
+from collections.abc import Iterator
+from typing import Optional
 from urllib import parse
 
 # Imports
@@ -54,7 +55,7 @@ class RequestsFetcher(FetcherInterface):
         # improve efficiency, but avoiding sharing state between different
         # hosts-scheme combinations to minimize subtle security issues.
         # Some cookies may not be HTTP-safe.
-        self._sessions: Dict[Tuple[str, str], requests.Session] = {}
+        self._sessions: dict[tuple[str, str], requests.Session] = {}
 
         # Default settings
         self.socket_timeout: int = socket_timeout  # seconds

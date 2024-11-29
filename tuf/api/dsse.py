@@ -1,7 +1,7 @@
 """Low-level TUF DSSE API. (experimental!)"""
 
 import json
-from typing import Generic, Type, cast
+from typing import Generic, cast
 
 from securesystemslib.dsse import Envelope as BaseSimpleEnvelope
 
@@ -135,7 +135,7 @@ class SimpleEnvelope(Generic[T], BaseSimpleEnvelope):
             # TODO: can we move this to tuf.api._payload?
             _type = payload_dict["_type"]
             if _type == _TARGETS:
-                inner_cls: Type[Signed] = Targets
+                inner_cls: type[Signed] = Targets
             elif _type == _SNAPSHOT:
                 inner_cls = Snapshot
             elif _type == _TIMESTAMP:

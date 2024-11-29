@@ -32,7 +32,7 @@ A basic example of repository implementation using the Metadata is available in
 
 import logging
 import tempfile
-from typing import Any, Dict, Generic, Optional, Type, cast
+from typing import Any, Generic, Optional, cast
 
 from securesystemslib.signer import Signature, Signer
 from securesystemslib.storage import FilesystemBackend, StorageBackendInterface
@@ -121,8 +121,8 @@ class Metadata(Generic[T]):
     def __init__(
         self,
         signed: T,
-        signatures: Optional[Dict[str, Signature]] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        signatures: Optional[dict[str, Signature]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         self.signed: T = signed
         self.signatures = signatures if signatures is not None else {}
@@ -153,7 +153,7 @@ class Metadata(Generic[T]):
         return CanonicalJSONSerializer().serialize(self.signed)
 
     @classmethod
-    def from_dict(cls, metadata: Dict[str, Any]) -> "Metadata[T]":
+    def from_dict(cls, metadata: dict[str, Any]) -> "Metadata[T]":
         """Create ``Metadata`` object from its json/dict representation.
 
         Args:
@@ -173,7 +173,7 @@ class Metadata(Generic[T]):
         _type = metadata["signed"]["_type"]
 
         if _type == _TARGETS:
-            inner_cls: Type[Signed] = Targets
+            inner_cls: type[Signed] = Targets
         elif _type == _SNAPSHOT:
             inner_cls = Snapshot
         elif _type == _TIMESTAMP:
@@ -184,7 +184,7 @@ class Metadata(Generic[T]):
             raise ValueError(f'unrecognized metadata type "{_type}"')
 
         # Make sure signatures are unique
-        signatures: Dict[str, Signature] = {}
+        signatures: dict[str, Signature] = {}
         for sig_dict in metadata.pop("signatures"):
             sig = Signature.from_dict(sig_dict)
             if sig.keyid in signatures:
@@ -292,7 +292,7 @@ class Metadata(Generic[T]):
 
         return serializer.serialize(self)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
 
         signatures = [sig.to_dict() for sig in self.signatures.values()]

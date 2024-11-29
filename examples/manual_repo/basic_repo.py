@@ -25,7 +25,6 @@ import os
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict
 
 from securesystemslib.signer import CryptoSigner, Signer
 
@@ -87,8 +86,8 @@ SPEC_VERSION = ".".join(SPECIFICATION_VERSION)
 
 # Define containers for role objects and cryptographic keys created below. This
 # allows us to sign and write metadata in a batch more easily.
-roles: Dict[str, Metadata] = {}
-signers: Dict[str, Signer] = {}
+roles: dict[str, Metadata] = {}
+signers: dict[str, Signer] = {}
 
 
 # Targets (integrity)

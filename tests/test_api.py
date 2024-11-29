@@ -12,7 +12,7 @@ import unittest
 from copy import copy, deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Optional
 
 from securesystemslib import exceptions as sslib_exceptions
 from securesystemslib import hash as sslib_hash
@@ -54,7 +54,7 @@ class TestMetadata(unittest.TestCase):
     temporary_directory: ClassVar[str]
     repo_dir: ClassVar[str]
     keystore_dir: ClassVar[str]
-    signers: ClassVar[Dict[str, Signer]]
+    signers: ClassVar[dict[str, Signer]]
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -763,7 +763,7 @@ class TestMetadata(unittest.TestCase):
             }
         )
         assert isinstance(targets.delegations, Delegations)
-        assert isinstance(targets.delegations.roles, Dict)
+        assert isinstance(targets.delegations.roles, dict)
         targets.delegations.roles["role2"] = delegated_role
 
         key_dict = {

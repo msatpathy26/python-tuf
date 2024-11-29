@@ -6,7 +6,7 @@
 import os
 import sys
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Optional
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from securesystemslib.signer import CryptoSigner, Signer, SSlibKey
@@ -16,13 +16,13 @@ from tuf.api.metadata import Metadata, Root, Snapshot, Targets, Timestamp
 from tuf.api.serialization.json import JSONSerializer
 
 # Hardcode keys and expiry time to achieve reproducibility.
-public_values: List[str] = [
+public_values: list[str] = [
     "b11d2ff132c033a657318c74c39526476c56de7556c776f11070842dbc4ac14c",
     "250f9ae3d1d3d5c419a73cfb4a470c01de1d5d3d61a3825416b5f5d6b88f4a30",
     "82380623abb9666d4bf274b1a02577469445a972e5650d270101faa5107b19c8",
     "0e6738fc1ac6fb4de680b4be99ecbcd99b030f3963f291277eef67bb9bd123e9",
 ]
-private_values: List[bytes] = [
+private_values: list[bytes] = [
     bytes.fromhex(
         "510e5e04d7a364af850533856eacdf65d30cc0f8803ecd5fdc0acc56ca2aa91c"
     ),
@@ -36,14 +36,14 @@ private_values: List[bytes] = [
         "7e2e751145d1b22f6e40d4ba2aa47158207acfd3c003f1cbd5a08141dfc22a15"
     ),
 ]
-keyids: List[str] = [
+keyids: list[str] = [
     "5822582e7072996c1eef1cec24b61115d364987faa486659fe3d3dce8dae2aba",
     "09d440e3725cec247dcb8703b646a87dd2a4d75343e8095c036c32795eefe3b9",
     "3458204ed467519c19a5316eb278b5608472a1bbf15850ebfb462d5315e4f86d",
     "2be5c21e3614f9f178fb49c4a34d0c18ffac30abd14ced917c60a52c8d8094b7",
 ]
 
-signers: List[Signer] = []
+signers: list[Signer] = []
 for index in range(len(keyids)):
     key = SSlibKey(
         keyids[index],

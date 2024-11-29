@@ -8,17 +8,14 @@ import abc
 import fnmatch
 import io
 import logging
+from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import (
     IO,
     Any,
     ClassVar,
-    Dict,
-    Iterator,
-    List,
     Optional,
-    Tuple,
     TypeVar,
     Union,
 )
@@ -103,7 +100,7 @@ class Signed(metaclass=abc.ABCMeta):
         version: Optional[int],
         spec_version: Optional[str],
         expires: Optional[datetime],
-        unrecognized_fields: Optional[Dict[str, Any]],
+        unrecognized_fields: Optional[dict[str, Any]],
     ):
         if spec_version is None:
             spec_version = ".".join(SPECIFICATION_VERSION)
@@ -146,13 +143,13 @@ class Signed(metaclass=abc.ABCMeta):
         )
 
     @abc.abstractmethod
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize and return a dict representation of self."""
         raise NotImplementedError
 
     @classmethod
     @abc.abstractmethod
-    def from_dict(cls, signed_dict: Dict[str, Any]) -> "Signed":
+    def from_dict(cls, signed_dict: dict[str, Any]) -> "Signed":
         """Deserialization helper, creates object from json/dict
         representation.
         """
@@ -160,8 +157,8 @@ class Signed(metaclass=abc.ABCMeta):
 
     @classmethod
     def _common_fields_from_dict(
-        cls, signed_dict: Dict[str, Any]
-    ) -> Tuple[int, str, datetime]:
+        cls, signed_dict: dict[str, Any]
+    ) -> tuple[int, str, datetime]:
         """Return common fields of ``Signed`` instances from the passed dict
         representation, and returns an ordered list to be passed as leading
         positional arguments to a subclass constructor.
@@ -186,7 +183,7 @@ class Signed(metaclass=abc.ABCMeta):
 
         return version, spec_version, expires
 
-    def _common_fields_to_dict(self) -> Dict[str, Any]:
+    def _common_fields_to_dict(self) -> dict[str, Any]:
         """Return a dict representation of common fields of
         ``Signed`` instances.
 
@@ -238,9 +235,9 @@ class Role:
 
     def __init__(
         self,
-        keyids: List[str],
+        keyids: list[str],
         threshold: int,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         if len(set(keyids)) != len(keyids):
             raise ValueError(f"Nonunique keyids: {keyids}")
@@ -264,7 +261,7 @@ class Role:
         )
 
     @classmethod
-    def from_dict(cls, role_dict: Dict[str, Any]) -> "Role":
+    def from_dict(cls, role_dict: dict[str, Any]) -> "Role":
         """Create ``Role`` object from its json/dict representation.
 
         Raises:
@@ -275,7 +272,7 @@ class Role:
         # All fields left in the role_dict are unrecognized.
         return cls(keyids, threshold, role_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dictionary representation of self."""
         return {
             "keyids": self.keyids,
@@ -295,8 +292,8 @@ class VerificationResult:
     """
 
     threshold: int
-    signed: Dict[str, Key]
-    unsigned: Dict[str, Key]
+    signed: dict[str, Key]
+    unsigned: dict[str, Key]
 
     def __bool__(self) -> bool:
         return self.verified
@@ -343,22 +340,20 @@ class RootVerificationResult:
         return self.first.verified and self.second.verified
 
     @property
-    def signed(self) -> Dict[str, Key]:
+    def signed(self) -> dict[str, Key]:
         """Dictionary of all signing keys that have signed, from both
         VerificationResults.
-        return a union of all signed (in python<3.9 this requires
-        dict unpacking)
+        return a union of all signed.
         """
-        return {**self.first.signed, **self.second.signed}
+        return self.first.signed | self.second.signed
 
     @property
-    def unsigned(self) -> Dict[str, Key]:
+    def unsigned(self) -> dict[str, Key]:
         """Dictionary of all signing keys that have not signed, from both
         VerificationResults.
-        return a union of all unsigned (in python<3.9 this requires
-        dict unpacking)
+        return a union of all unsigned.
         """
-        return {**self.first.unsigned, **self.second.unsigned}
+        return self.first.unsigned | self.second.unsigned
 
 
 class _DelegatorMixin(metaclass=abc.ABCMeta):
@@ -384,7 +379,7 @@ class _DelegatorMixin(metaclass=abc.ABCMeta):
         self,
         delegated_role: str,
         payload: bytes,
-        signatures: Dict[str, Signature],
+        signatures: dict[str, Signature],
     ) -> VerificationResult:
         """Return signature threshold verification result for delegated role.
 
@@ -430,7 +425,7 @@ class _DelegatorMixin(metaclass=abc.ABCMeta):
         self,
         delegated_role: str,
         payload: bytes,
-        signatures: Dict[str, Signature],
+        signatures: dict[str, Signature],
     ) -> None:
         """Verify signature threshold for delegated role.
 
@@ -489,10 +484,10 @@ class Root(Signed, _DelegatorMixin):
         version: Optional[int] = None,
         spec_version: Optional[str] = None,
         expires: Optional[datetime] = None,
-        keys: Optional[Dict[str, Key]] = None,
-        roles: Optional[Dict[str, Role]] = None,
+        keys: Optional[dict[str, Key]] = None,
+        roles: Optional[dict[str, Role]] = None,
         consistent_snapshot: Optional[bool] = True,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         super().__init__(version, spec_version, expires, unrecognized_fields)
         self.consistent_snapshot = consistent_snapshot
@@ -516,7 +511,7 @@ class Root(Signed, _DelegatorMixin):
         )
 
     @classmethod
-    def from_dict(cls, signed_dict: Dict[str, Any]) -> "Root":
+    def from_dict(cls, signed_dict: dict[str, Any]) -> "Root":
         """Create ``Root`` object from its json/dict representation.
 
         Raises:
@@ -535,7 +530,7 @@ class Root(Signed, _DelegatorMixin):
         # All fields left in the signed_dict are unrecognized.
         return cls(*common_args, keys, roles, consistent_snapshot, signed_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         root_dict = self._common_fields_to_dict()
         keys = {keyid: key.to_dict() for (keyid, key) in self.keys.items()}
@@ -616,7 +611,7 @@ class Root(Signed, _DelegatorMixin):
         self,
         previous: Optional["Root"],
         payload: bytes,
-        signatures: Dict[str, Signature],
+        signatures: dict[str, Signature],
     ) -> RootVerificationResult:
         """Return signature threshold verification result for two root roles.
 
@@ -661,7 +656,7 @@ class BaseFile:
 
     @staticmethod
     def _verify_hashes(
-        data: Union[bytes, IO[bytes]], expected_hashes: Dict[str, str]
+        data: Union[bytes, IO[bytes]], expected_hashes: dict[str, str]
     ) -> None:
         """Verify that the hash of ``data`` matches ``expected_hashes``."""
         is_bytes = isinstance(data, bytes)
@@ -707,7 +702,7 @@ class BaseFile:
             )
 
     @staticmethod
-    def _validate_hashes(hashes: Dict[str, str]) -> None:
+    def _validate_hashes(hashes: dict[str, str]) -> None:
         if not hashes:
             raise ValueError("Hashes must be a non empty dictionary")
         for key, value in hashes.items():
@@ -721,8 +716,8 @@ class BaseFile:
 
     @staticmethod
     def _get_length_and_hashes(
-        data: Union[bytes, IO[bytes]], hash_algorithms: Optional[List[str]]
-    ) -> Tuple[int, Dict[str, str]]:
+        data: Union[bytes, IO[bytes]], hash_algorithms: Optional[list[str]]
+    ) -> tuple[int, dict[str, str]]:
         """Calculate length and hashes of ``data``."""
         if isinstance(data, bytes):
             length = len(data)
@@ -777,8 +772,8 @@ class MetaFile(BaseFile):
         self,
         version: int = 1,
         length: Optional[int] = None,
-        hashes: Optional[Dict[str, str]] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        hashes: Optional[dict[str, str]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         if version <= 0:
             raise ValueError(f"Metafile version must be > 0, got {version}")
@@ -807,7 +802,7 @@ class MetaFile(BaseFile):
         )
 
     @classmethod
-    def from_dict(cls, meta_dict: Dict[str, Any]) -> "MetaFile":
+    def from_dict(cls, meta_dict: dict[str, Any]) -> "MetaFile":
         """Create ``MetaFile`` object from its json/dict representation.
 
         Raises:
@@ -825,7 +820,7 @@ class MetaFile(BaseFile):
         cls,
         version: int,
         data: Union[bytes, IO[bytes]],
-        hash_algorithms: List[str],
+        hash_algorithms: list[str],
     ) -> "MetaFile":
         """Creates MetaFile object from bytes.
         This constructor should only be used if hashes are wanted.
@@ -843,9 +838,9 @@ class MetaFile(BaseFile):
         length, hashes = cls._get_length_and_hashes(data, hash_algorithms)
         return cls(version, length, hashes)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dictionary representation of self."""
-        res_dict: Dict[str, Any] = {
+        res_dict: dict[str, Any] = {
             "version": self.version,
             **self.unrecognized_fields,
         }
@@ -907,7 +902,7 @@ class Timestamp(Signed):
         spec_version: Optional[str] = None,
         expires: Optional[datetime] = None,
         snapshot_meta: Optional[MetaFile] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         super().__init__(version, spec_version, expires, unrecognized_fields)
         self.snapshot_meta = snapshot_meta or MetaFile(1)
@@ -921,7 +916,7 @@ class Timestamp(Signed):
         )
 
     @classmethod
-    def from_dict(cls, signed_dict: Dict[str, Any]) -> "Timestamp":
+    def from_dict(cls, signed_dict: dict[str, Any]) -> "Timestamp":
         """Create ``Timestamp`` object from its json/dict representation.
 
         Raises:
@@ -933,7 +928,7 @@ class Timestamp(Signed):
         # All fields left in the timestamp_dict are unrecognized.
         return cls(*common_args, snapshot_meta, signed_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         res_dict = self._common_fields_to_dict()
         res_dict["meta"] = {"snapshot.json": self.snapshot_meta.to_dict()}
@@ -969,8 +964,8 @@ class Snapshot(Signed):
         version: Optional[int] = None,
         spec_version: Optional[str] = None,
         expires: Optional[datetime] = None,
-        meta: Optional[Dict[str, MetaFile]] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        meta: Optional[dict[str, MetaFile]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         super().__init__(version, spec_version, expires, unrecognized_fields)
         self.meta = meta if meta is not None else {"targets.json": MetaFile(1)}
@@ -982,7 +977,7 @@ class Snapshot(Signed):
         return super().__eq__(other) and self.meta == other.meta
 
     @classmethod
-    def from_dict(cls, signed_dict: Dict[str, Any]) -> "Snapshot":
+    def from_dict(cls, signed_dict: dict[str, Any]) -> "Snapshot":
         """Create ``Snapshot`` object from its json/dict representation.
 
         Raises:
@@ -996,7 +991,7 @@ class Snapshot(Signed):
         # All fields left in the snapshot_dict are unrecognized.
         return cls(*common_args, meta, signed_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         snapshot_dict = self._common_fields_to_dict()
         meta_dict = {}
@@ -1040,12 +1035,12 @@ class DelegatedRole(Role):
     def __init__(
         self,
         name: str,
-        keyids: List[str],
+        keyids: list[str],
         threshold: int,
         terminating: bool,
-        paths: Optional[List[str]] = None,
-        path_hash_prefixes: Optional[List[str]] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        paths: Optional[list[str]] = None,
+        path_hash_prefixes: Optional[list[str]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         super().__init__(keyids, threshold, unrecognized_fields)
         self.name = name
@@ -1079,7 +1074,7 @@ class DelegatedRole(Role):
         )
 
     @classmethod
-    def from_dict(cls, role_dict: Dict[str, Any]) -> "DelegatedRole":
+    def from_dict(cls, role_dict: dict[str, Any]) -> "DelegatedRole":
         """Create ``DelegatedRole`` object from its json/dict representation.
 
         Raises:
@@ -1102,7 +1097,7 @@ class DelegatedRole(Role):
             role_dict,
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         base_role_dict = super().to_dict()
         res_dict = {
@@ -1201,11 +1196,11 @@ class SuccinctRoles(Role):
 
     def __init__(
         self,
-        keyids: List[str],
+        keyids: list[str],
         threshold: int,
         bit_length: int,
         name_prefix: str,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(keyids, threshold, unrecognized_fields)
 
@@ -1237,7 +1232,7 @@ class SuccinctRoles(Role):
         )
 
     @classmethod
-    def from_dict(cls, role_dict: Dict[str, Any]) -> "SuccinctRoles":
+    def from_dict(cls, role_dict: dict[str, Any]) -> "SuccinctRoles":
         """Create ``SuccinctRoles`` object from its json/dict representation.
 
         Raises:
@@ -1250,7 +1245,7 @@ class SuccinctRoles(Role):
         # All fields left in the role_dict are unrecognized.
         return cls(keyids, threshold, bit_length, name_prefix, role_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         base_role_dict = super().to_dict()
         return {
@@ -1344,10 +1339,10 @@ class Delegations:
 
     def __init__(
         self,
-        keys: Dict[str, Key],
-        roles: Optional[Dict[str, DelegatedRole]] = None,
+        keys: dict[str, Key],
+        roles: Optional[dict[str, DelegatedRole]] = None,
         succinct_roles: Optional[SuccinctRoles] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         self.keys = keys
         if sum(1 for v in [roles, succinct_roles] if v is not None) != 1:
@@ -1389,7 +1384,7 @@ class Delegations:
         return all_attributes_check
 
     @classmethod
-    def from_dict(cls, delegations_dict: Dict[str, Any]) -> "Delegations":
+    def from_dict(cls, delegations_dict: dict[str, Any]) -> "Delegations":
         """Create ``Delegations`` object from its json/dict representation.
 
         Raises:
@@ -1400,7 +1395,7 @@ class Delegations:
         for keyid, key_dict in keys.items():
             keys_res[keyid] = Key.from_dict(keyid, key_dict)
         roles = delegations_dict.pop("roles", None)
-        roles_res: Optional[Dict[str, DelegatedRole]] = None
+        roles_res: Optional[dict[str, DelegatedRole]] = None
 
         if roles is not None:
             roles_res = {}
@@ -1418,10 +1413,10 @@ class Delegations:
         # All fields left in the delegations_dict are unrecognized.
         return cls(keys_res, roles_res, succinct_roles_info, delegations_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         keys = {keyid: key.to_dict() for keyid, key in self.keys.items()}
-        res_dict: Dict[str, Any] = {
+        res_dict: dict[str, Any] = {
             "keys": keys,
             **self.unrecognized_fields,
         }
@@ -1435,7 +1430,7 @@ class Delegations:
 
     def get_roles_for_target(
         self, target_filepath: str
-    ) -> Iterator[Tuple[str, bool]]:
+    ) -> Iterator[tuple[str, bool]]:
         """Given ``target_filepath`` get names and terminating status of all
         delegated roles who are responsible for it.
 
@@ -1475,9 +1470,9 @@ class TargetFile(BaseFile):
     def __init__(
         self,
         length: int,
-        hashes: Dict[str, str],
+        hashes: dict[str, str],
         path: str,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ):
         self._validate_length(length)
         self._validate_hashes(hashes)
@@ -1510,7 +1505,7 @@ class TargetFile(BaseFile):
         )
 
     @classmethod
-    def from_dict(cls, target_dict: Dict[str, Any], path: str) -> "TargetFile":
+    def from_dict(cls, target_dict: dict[str, Any], path: str) -> "TargetFile":
         """Create ``TargetFile`` object from its json/dict representation.
 
         Raises:
@@ -1522,7 +1517,7 @@ class TargetFile(BaseFile):
         # All fields left in the target_dict are unrecognized.
         return cls(length, hashes, path, target_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the JSON-serializable dictionary representation of self."""
         return {
             "length": self.length,
@@ -1535,7 +1530,7 @@ class TargetFile(BaseFile):
         cls,
         target_file_path: str,
         local_path: str,
-        hash_algorithms: Optional[List[str]] = None,
+        hash_algorithms: Optional[list[str]] = None,
     ) -> "TargetFile":
         """Create ``TargetFile`` object from a file.
 
@@ -1559,7 +1554,7 @@ class TargetFile(BaseFile):
         cls,
         target_file_path: str,
         data: Union[bytes, IO[bytes]],
-        hash_algorithms: Optional[List[str]] = None,
+        hash_algorithms: Optional[list[str]] = None,
     ) -> "TargetFile":
         """Create ``TargetFile`` object from bytes.
 
@@ -1590,7 +1585,7 @@ class TargetFile(BaseFile):
         self._verify_length(data, self.length)
         self._verify_hashes(data, self.hashes)
 
-    def get_prefixed_paths(self) -> List[str]:
+    def get_prefixed_paths(self) -> list[str]:
         """
         Return hash-prefixed URL path fragments for the target file path.
         """
@@ -1634,9 +1629,9 @@ class Targets(Signed, _DelegatorMixin):
         version: Optional[int] = None,
         spec_version: Optional[str] = None,
         expires: Optional[datetime] = None,
-        targets: Optional[Dict[str, TargetFile]] = None,
+        targets: Optional[dict[str, TargetFile]] = None,
         delegations: Optional[Delegations] = None,
-        unrecognized_fields: Optional[Dict[str, Any]] = None,
+        unrecognized_fields: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(version, spec_version, expires, unrecognized_fields)
         self.targets = targets if targets is not None else {}
@@ -1653,7 +1648,7 @@ class Targets(Signed, _DelegatorMixin):
         )
 
     @classmethod
-    def from_dict(cls, signed_dict: Dict[str, Any]) -> "Targets":
+    def from_dict(cls, signed_dict: dict[str, Any]) -> "Targets":
         """Create ``Targets`` object from its json/dict representation.
 
         Raises:
@@ -1675,7 +1670,7 @@ class Targets(Signed, _DelegatorMixin):
         # All fields left in the targets_dict are unrecognized.
         return cls(*common_args, res_targets, delegations, signed_dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Return the dict representation of self."""
         targets_dict = self._common_fields_to_dict()
         targets = {}

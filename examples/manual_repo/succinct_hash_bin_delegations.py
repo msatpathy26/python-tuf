@@ -23,7 +23,6 @@ import os
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict
 
 from securesystemslib.signer import CryptoSigner
 
@@ -105,7 +104,7 @@ succinct_roles = SuccinctRoles(
     bit_length=BIT_LENGTH,
     name_prefix=NAME_PREFIX,
 )
-delegations_keys_info: Dict[str, Key] = {}
+delegations_keys_info: dict[str, Key] = {}
 delegations_keys_info[bins_key.keyid] = bins_key
 
 targets.signed.delegations = Delegations(
@@ -119,7 +118,7 @@ targets.signed.delegations = Delegations(
 
 assert targets.signed.delegations.succinct_roles is not None  # make mypy happy
 
-delegated_bins: Dict[str, Metadata[Targets]] = {}
+delegated_bins: dict[str, Metadata[Targets]] = {}
 for delegated_bin_name in targets.signed.delegations.succinct_roles.get_roles():
     delegated_bins[delegated_bin_name] = Metadata(
         Targets(expires=expiration_date)

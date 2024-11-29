@@ -5,9 +5,10 @@
 
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from contextlib import contextmanager, suppress
 from copy import deepcopy
-from typing import Dict, Generator, Optional, Tuple
+from typing import Optional
 
 from tuf.api.exceptions import UnsignedMetadataError
 from tuf.api.metadata import (
@@ -63,7 +64,7 @@ class Repository(ABC):
         raise NotImplementedError
 
     @property
-    def targets_infos(self) -> Dict[str, MetaFile]:
+    def targets_infos(self) -> dict[str, MetaFile]:
         """Returns the MetaFiles for current targets metadatas
 
         This property is used by do_snapshot() to update Snapshot.meta:
@@ -168,7 +169,7 @@ class Repository(ABC):
 
     def do_snapshot(
         self, force: bool = False
-    ) -> Tuple[bool, Dict[str, MetaFile]]:
+    ) -> tuple[bool, dict[str, MetaFile]]:
         """Update snapshot meta information
 
         Updates the snapshot meta information according to current targets
@@ -187,7 +188,7 @@ class Repository(ABC):
         # * any targets files are not yet in snapshot or
         # * any targets version is incorrect
         update_version = force
-        removed: Dict[str, MetaFile] = {}
+        removed: dict[str, MetaFile] = {}
 
         root = self.root()
         snapshot_md = self.open(Snapshot.type)
@@ -230,7 +231,7 @@ class Repository(ABC):
 
     def do_timestamp(
         self, force: bool = False
-    ) -> Tuple[bool, Optional[MetaFile]]:
+    ) -> tuple[bool, Optional[MetaFile]]:
         """Update timestamp meta information
 
         Updates timestamp according to current snapshot state

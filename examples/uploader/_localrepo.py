@@ -9,7 +9,6 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Dict
 
 import requests
 from securesystemslib.signer import CryptoSigner, Signer
@@ -50,7 +49,7 @@ class LocalRepository(Repository):
         self.updater.refresh()
 
     @property
-    def targets_infos(self) -> Dict[str, MetaFile]:
+    def targets_infos(self) -> dict[str, MetaFile]:
         raise NotImplementedError  # we never call snapshot
 
     @property

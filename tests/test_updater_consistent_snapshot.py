@@ -7,7 +7,8 @@ import os
 import sys
 import tempfile
 import unittest
-from typing import Any, Dict, Iterable, List, Optional
+from collections.abc import Iterable
+from typing import Any, Optional
 
 from tests import utils
 from tests.repository_simulator import RepositorySimulator
@@ -120,13 +121,13 @@ class TestConsistentSnapshot(unittest.TestCase):
 
     @utils.run_sub_tests_with_dataset(top_level_roles_data)
     def test_top_level_roles_update(
-        self, test_case_data: Dict[str, Any]
+        self, test_case_data: dict[str, Any]
     ) -> None:
         # Test if the client fetches and stores metadata files with the
         # correct version prefix, depending on 'consistent_snapshot' config
         try:
             consistent_snapshot: bool = test_case_data["consistent_snapshot"]
-            exp_calls: List[Any] = test_case_data["calls"]
+            exp_calls: list[Any] = test_case_data["calls"]
 
             self.setup_subtest(consistent_snapshot)
             updater = self._init_updater()
@@ -155,7 +156,7 @@ class TestConsistentSnapshot(unittest.TestCase):
 
     @utils.run_sub_tests_with_dataset(delegated_roles_data)
     def test_delegated_roles_update(
-        self, test_case_data: Dict[str, Any]
+        self, test_case_data: dict[str, Any]
     ) -> None:
         # Test if the client fetches and stores delegated metadata files with
         # the correct version prefix, depending on 'consistent_snapshot' config
@@ -211,7 +212,7 @@ class TestConsistentSnapshot(unittest.TestCase):
     }
 
     @utils.run_sub_tests_with_dataset(targets_download_data)
-    def test_download_targets(self, test_case_data: Dict[str, Any]) -> None:
+    def test_download_targets(self, test_case_data: dict[str, Any]) -> None:
         # Test if the client fetches and stores target files with
         # the correct hash prefix, depending on 'consistent_snapshot'
         # and 'prefix_targets_with_hash' config
@@ -219,7 +220,7 @@ class TestConsistentSnapshot(unittest.TestCase):
             consistent_snapshot: bool = test_case_data["consistent_snapshot"]
             prefix_targets_with_hash: bool = test_case_data["prefix_targets"]
             hash_algo: Optional[str] = test_case_data["hash_algo"]
-            targetpaths: List[str] = test_case_data["targetpaths"]
+            targetpaths: list[str] = test_case_data["targetpaths"]
 
             self.setup_subtest(consistent_snapshot, prefix_targets_with_hash)
             # Add targets to repository

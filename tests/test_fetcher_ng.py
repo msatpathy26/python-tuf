@@ -10,7 +10,8 @@ import os
 import sys
 import tempfile
 import unittest
-from typing import Any, ClassVar, Iterator
+from collections.abc import Iterator
+from typing import Any, ClassVar
 from unittest.mock import Mock, patch
 
 import requests
