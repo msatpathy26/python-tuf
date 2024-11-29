@@ -3,12 +3,14 @@
 
 """Test ngclient Updater key rotation handling"""
 
+from __future__ import annotations
+
 import os
 import sys
 import tempfile
 import unittest
 from dataclasses import dataclass
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from securesystemslib.signer import CryptoSigner, Signer
 
@@ -25,14 +27,14 @@ class MdVersion:
     keys: list[int]
     threshold: int
     sigs: list[int]
-    res: Optional[type[Exception]] = None
+    res: type[Exception] | None = None
 
 
 class TestUpdaterKeyRotations(unittest.TestCase):
     """Test ngclient root rotation handling"""
 
     # set dump_dir to trigger repository state dumps
-    dump_dir: Optional[str] = None
+    dump_dir: str | None = None
     temp_dir: ClassVar[tempfile.TemporaryDirectory]
     keys: ClassVar[list[Key]]
     signers: ClassVar[list[Signer]]

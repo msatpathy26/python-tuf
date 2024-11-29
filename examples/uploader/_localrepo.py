@@ -3,6 +3,8 @@
 
 """A Repository implementation for maintainer and developer tools"""
 
+from __future__ import annotations
+
 import contextlib
 import copy
 import json

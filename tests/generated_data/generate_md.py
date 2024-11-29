@@ -3,10 +3,11 @@
 # Copyright New York University and the TUF contributors
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
+from __future__ import annotations
+
 import os
 import sys
 from datetime import datetime, timezone
-from typing import Optional
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from securesystemslib.signer import CryptoSigner, Signer, SSlibKey
@@ -80,7 +81,7 @@ def verify_generation(md: Metadata, path: str) -> None:
 
 
 def generate_all_files(
-    dump: Optional[bool] = False, verify: Optional[bool] = False
+    dump: bool | None = False, verify: bool | None = False
 ) -> None:
     """Generate a new repository and optionally verify it.
 

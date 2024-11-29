@@ -3,12 +3,13 @@
 
 """Simple example of using the repository library to build a repository"""
 
+from __future__ import annotations
+
 import copy
 import json
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from typing import Union
 
 from securesystemslib.signer import CryptoSigner, Key, Signer
 
@@ -93,7 +94,7 @@ class SimpleRepository(Repository):
 
     def _get_verification_result(
         self, role: str, md: Metadata
-    ) -> Union[VerificationResult, RootVerificationResult]:
+    ) -> VerificationResult | RootVerificationResult:
         """Verify roles metadata using the existing repository metadata"""
         if role == Root.type:
             assert isinstance(md.signed, Root)

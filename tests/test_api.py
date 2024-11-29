@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 """Unit tests for api/metadata.py"""
 
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -12,7 +14,7 @@ import unittest
 from copy import copy, deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from securesystemslib import exceptions as sslib_exceptions
 from securesystemslib import hash as sslib_hash
@@ -245,8 +247,8 @@ class TestMetadata(unittest.TestCase):
                 cls,
                 priv_key_uri: str,
                 public_key: Key,
-                secrets_handler: Optional[SecretsHandler] = None,
-            ) -> "Signer":
+                secrets_handler: SecretsHandler | None = None,
+            ) -> Signer:
                 pass
 
             @property

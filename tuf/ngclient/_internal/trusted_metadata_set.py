@@ -61,13 +61,12 @@ Example of loading root, timestamp and snapshot:
 >>>         trusted_set.update_snapshot(f.read())
 """
 
+from __future__ import annotations
+
 import datetime
 import logging
 from collections import abc
-from collections.abc import Iterator
-from typing import Optional, Union, cast
-
-from securesystemslib.signer import Signature
+from typing import TYPE_CHECKING, Union, cast
 
 from tuf.api import exceptions
 from tuf.api.dsse import SimpleEnvelope
@@ -81,6 +80,11 @@ from tuf.api.metadata import (
     Timestamp,
 )
 from tuf.ngclient.config import EnvelopeType
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from securesystemslib.signer import Signature
 
 logger = logging.getLogger(__name__)
 
@@ -270,7 +274,7 @@ class TrustedMetadataSet(abc.Mapping):
             raise exceptions.ExpiredMetadataError("timestamp.json is expired")
 
     def update_snapshot(
-        self, data: bytes, trusted: Optional[bool] = False
+        self, data: bytes, trusted: bool | None = False
     ) -> Snapshot:
         """Verify and load ``data`` as new snapshot metadata.
 
@@ -402,7 +406,7 @@ class TrustedMetadataSet(abc.Mapping):
         # does not match meta version in timestamp
         self._check_final_snapshot()
 
-        delegator: Optional[Delegator] = self.get(delegator_name)
+        delegator: Delegator | None = self.get(delegator_name)
         if delegator is None:
             raise RuntimeError("Cannot load targets before delegator")
 
@@ -453,8 +457,8 @@ class TrustedMetadataSet(abc.Mapping):
 def _load_from_metadata(
     role: type[T],
     data: bytes,
-    delegator: Optional[Delegator] = None,
-    role_name: Optional[str] = None,
+    delegator: Delegator | None = None,
+    role_name: str | None = None,
 ) -> tuple[T, bytes, dict[str, Signature]]:
     """Load traditional metadata bytes, and extract and verify payload.
 
@@ -480,8 +484,8 @@ def _load_from_metadata(
 def _load_from_simple_envelope(
     role: type[T],
     data: bytes,
-    delegator: Optional[Delegator] = None,
-    role_name: Optional[str] = None,
+    delegator: Delegator | None = None,
+    role_name: str | None = None,
 ) -> tuple[T, bytes, dict[str, Signature]]:
     """Load simple envelope bytes, and extract and verify payload.
 

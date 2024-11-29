@@ -18,6 +18,8 @@
   Provide common utilities for TUF tests
 """
 
+from __future__ import annotations
+
 import argparse
 import errno
 import logging
@@ -28,11 +30,13 @@ import subprocess
 import sys
 import threading
 import time
-import unittest
 import warnings
-from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import IO, Any, Callable, Optional
+from typing import IO, TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+    import unittest
+    from collections.abc import Iterator
 
 logger = logging.getLogger(__name__)
 
@@ -42,15 +46,12 @@ TESTS_DIR = os.path.dirname(os.path.realpath(__file__))
 # Used when forming URLs on the client side
 TEST_HOST_ADDRESS = "127.0.0.1"
 
-# DataSet is only here so type hints can be used.
-DataSet = dict[str, Any]
-
 
 # Test runner decorator: Runs the test as a set of N SubTests,
 # (where N is number of items in dataset), feeding the actual test
 # function one test case at a time
 def run_sub_tests_with_dataset(
-    dataset: DataSet,
+    dataset: dict[str, Any],
 ) -> Callable[[Callable], Callable]:
     """Decorator starting a unittest.TestCase.subtest() for each of the
     cases in dataset"""
@@ -103,7 +104,7 @@ def wait_for_server(
     succeeded = False
     while not succeeded and remaining_timeout > 0:
         try:
-            sock: Optional[socket.socket] = socket.socket(
+            sock: socket.socket | None = socket.socket(
                 socket.AF_INET, socket.SOCK_STREAM
             )
             assert sock is not None
@@ -185,14 +186,14 @@ class TestServerProcess:
         server: str = os.path.join(TESTS_DIR, "simple_server.py"),
         timeout: int = 10,
         popen_cwd: str = ".",
-        extra_cmd_args: Optional[list[str]] = None,
+        extra_cmd_args: list[str] | None = None,
     ):
         self.server = server
         self.__logger = log
         # Stores popped messages from the queue.
         self.__logged_messages: list[str] = []
-        self.__server_process: Optional[subprocess.Popen] = None
-        self._log_queue: Optional[queue.Queue] = None
+        self.__server_process: subprocess.Popen | None = None
+        self._log_queue: queue.Queue | None = None
         self.port = -1
         if extra_cmd_args is None:
             extra_cmd_args = []

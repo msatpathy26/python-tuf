@@ -16,12 +16,14 @@ NOTE: Metadata files will be written to a 'tmp*'-directory in CWD.
 
 """
 
+from __future__ import annotations
+
 import hashlib
 import os
 import tempfile
-from collections.abc import Iterator
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from securesystemslib.signer import CryptoSigner, Signer
 
@@ -33,6 +35,9 @@ from tuf.api.metadata import (
     Targets,
 )
 from tuf.api.serialization.json import JSONSerializer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 def _in(days: float) -> datetime:

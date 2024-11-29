@@ -1,11 +1,13 @@
 """Unit tests for 'tuf/ngclient/_internal/trusted_metadata_set.py'."""
 
+from __future__ import annotations
+
 import logging
 import os
 import sys
 import unittest
 from datetime import datetime, timezone
-from typing import Callable, ClassVar, Optional
+from typing import Callable, ClassVar
 
 from securesystemslib.signer import Signer
 
@@ -104,8 +106,8 @@ class TestTrustedMetadataSet(unittest.TestCase):
 
     def _update_all_besides_targets(
         self,
-        timestamp_bytes: Optional[bytes] = None,
-        snapshot_bytes: Optional[bytes] = None,
+        timestamp_bytes: bytes | None = None,
+        snapshot_bytes: bytes | None = None,
     ) -> None:
         """Update all metadata roles besides targets.
 

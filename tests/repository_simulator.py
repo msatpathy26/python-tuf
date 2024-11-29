@@ -42,13 +42,14 @@ Example::
     updater.refresh()
 """
 
+from __future__ import annotations
+
 import datetime
 import logging
 import os
 import tempfile
-from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import TYPE_CHECKING
 from urllib import parse
 
 import securesystemslib.hash as sslib_hash
@@ -72,6 +73,9 @@ from tuf.api.metadata import (
 from tuf.api.serialization.json import JSONSerializer
 from tuf.ngclient.fetcher import FetcherInterface
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 logger = logging.getLogger(__name__)
 
 SPEC_VER = ".".join(SPECIFICATION_VERSION)
@@ -81,8 +85,8 @@ SPEC_VER = ".".join(SPECIFICATION_VERSION)
 class FetchTracker:
     """Fetcher counter for metadata and targets."""
 
-    metadata: list[tuple[str, Optional[int]]] = field(default_factory=list)
-    targets: list[tuple[str, Optional[str]]] = field(default_factory=list)
+    metadata: list[tuple[str, int | None]] = field(default_factory=list)
+    targets: list[tuple[str, str | None]] = field(default_factory=list)
 
 
 @dataclass
@@ -116,7 +120,7 @@ class RepositorySimulator(FetcherInterface):
         # Enable hash-prefixed target file names
         self.prefix_targets_with_hash = True
 
-        self.dump_dir: Optional[str] = None
+        self.dump_dir: str | None = None
         self.dump_version = 0
 
         self.fetch_tracker = FetchTracker()
@@ -201,7 +205,7 @@ class RepositorySimulator(FetcherInterface):
             if role == Root.type or (
                 self.root.consistent_snapshot and ver_and_name != Timestamp.type
             ):
-                version: Optional[int] = int(version_str)
+                version: int | None = int(version_str)
             else:
                 # the file is not version-prefixed
                 role = ver_and_name
@@ -213,7 +217,7 @@ class RepositorySimulator(FetcherInterface):
             target_path = path[len("/targets/") :]
             dir_parts, sep, prefixed_filename = target_path.rpartition("/")
             # extract the hash prefix, if any
-            prefix: Optional[str] = None
+            prefix: str | None = None
             filename = prefixed_filename
             if self.root.consistent_snapshot and self.prefix_targets_with_hash:
                 prefix, _, filename = prefixed_filename.partition(".")
@@ -223,9 +227,7 @@ class RepositorySimulator(FetcherInterface):
         else:
             raise DownloadHTTPError(f"Unknown path '{path}'", 404)
 
-    def fetch_target(
-        self, target_path: str, target_hash: Optional[str]
-    ) -> bytes:
+    def fetch_target(self, target_path: str, target_hash: str | None) -> bytes:
         """Return data for 'target_path', checking 'target_hash' if it is given.
 
         If hash is None, then consistent_snapshot is not used.
@@ -244,7 +246,7 @@ class RepositorySimulator(FetcherInterface):
         logger.debug("fetched target %s", target_path)
         return repo_target.data
 
-    def fetch_metadata(self, role: str, version: Optional[int] = None) -> bytes:
+    def fetch_metadata(self, role: str, version: int | None = None) -> bytes:
         """Return signed metadata for 'role', using 'version' if it is given.
 
         If version is None, non-versioned metadata is being requested.
@@ -261,7 +263,7 @@ class RepositorySimulator(FetcherInterface):
             return self.signed_roots[version - 1]
 
         # sign and serialize the requested metadata
-        md: Optional[Metadata]
+        md: Metadata | None
         if role == Timestamp.type:
             md = self.md_timestamp
         elif role == Snapshot.type:

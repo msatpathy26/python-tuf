@@ -3,12 +3,13 @@
 
 """Repository Abstraction for metadata management"""
 
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Generator
 from contextlib import contextmanager, suppress
 from copy import deepcopy
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from tuf.api.exceptions import UnsignedMetadataError
 from tuf.api.metadata import (
@@ -20,6 +21,9 @@ from tuf.api.metadata import (
     Targets,
     Timestamp,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 logger = logging.getLogger(__name__)
 
@@ -229,9 +233,7 @@ class Repository(ABC):
 
         return update_version, removed
 
-    def do_timestamp(
-        self, force: bool = False
-    ) -> tuple[bool, Optional[MetaFile]]:
+    def do_timestamp(self, force: bool = False) -> tuple[bool, MetaFile | None]:
         """Update timestamp meta information
 
         Updates timestamp according to current snapshot state

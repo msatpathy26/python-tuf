@@ -9,9 +9,10 @@ library.
 # sigstore-python 1.0 still uses the module from there). requests_fetcher
 # can be moved out of _internal once sigstore-python 1.0 is not relevant.
 
+from __future__ import annotations
+
 import logging
-from collections.abc import Iterator
-from typing import Optional
+from typing import TYPE_CHECKING
 from urllib import parse
 
 # Imports
@@ -20,6 +21,9 @@ import requests
 import tuf
 from tuf.api import exceptions
 from tuf.ngclient.fetcher import FetcherInterface
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 # Globals
 logger = logging.getLogger(__name__)
@@ -39,7 +43,7 @@ class RequestsFetcher(FetcherInterface):
         self,
         socket_timeout: int = 30,
         chunk_size: int = 400000,
-        app_user_agent: Optional[str] = None,
+        app_user_agent: str | None = None,
     ) -> None:
         # http://docs.python-requests.org/en/master/user/advanced/#session-objects:
         #
@@ -103,7 +107,7 @@ class RequestsFetcher(FetcherInterface):
 
         return self._chunks(response)
 
-    def _chunks(self, response: "requests.Response") -> Iterator[bytes]:
+    def _chunks(self, response: requests.Response) -> Iterator[bytes]:
         """A generator function to be returned by fetch.
 
         This way the caller of fetch can differentiate between connection

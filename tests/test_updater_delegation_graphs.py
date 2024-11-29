@@ -4,13 +4,14 @@
 """Test updating delegated targets roles and searching for
 target files with various delegation graphs"""
 
+from __future__ import annotations
+
 import os
 import sys
 import tempfile
 import unittest
-from collections.abc import Iterable
 from dataclasses import astuple, dataclass, field
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from tests import utils
 from tests.repository_simulator import RepositorySimulator
@@ -23,6 +24,9 @@ from tuf.api.metadata import (
 )
 from tuf.ngclient import Updater
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 @dataclass
 class TestDelegation:
@@ -31,8 +35,8 @@ class TestDelegation:
     keyids: list[str] = field(default_factory=list)
     threshold: int = 1
     terminating: bool = False
-    paths: Optional[list[str]] = field(default_factory=lambda: ["*"])
-    path_hash_prefixes: Optional[list[str]] = None
+    paths: list[str] | None = field(default_factory=lambda: ["*"])
+    path_hash_prefixes: list[str] | None = None
 
 
 @dataclass
@@ -63,7 +67,7 @@ class TestDelegations(unittest.TestCase):
     """Base class for delegation tests"""
 
     # set dump_dir to trigger repository state dumps
-    dump_dir: Optional[str] = None
+    dump_dir: str | None = None
 
     def setUp(self) -> None:
         self.subtest_count = 0
@@ -139,7 +143,7 @@ class TestDelegationsGraphs(TestDelegations):
     """Test creating delegations graphs with different complexity
     and successfully updating the delegated roles metadata"""
 
-    graphs: utils.DataSet = {
+    graphs = {
         "basic delegation": DelegationsTestCase(
             delegations=[TestDelegation("targets", "A")],
             visited_order=["A"],
@@ -287,7 +291,7 @@ class TestDelegationsGraphs(TestDelegations):
         finally:
             self.teardown_subtest()
 
-    invalid_metadata: utils.DataSet = {
+    invalid_metadata = {
         "unsigned delegated role": DelegationsTestCase(
             delegations=[
                 TestDelegation("targets", "invalid"),
@@ -360,7 +364,7 @@ class TestDelegationsGraphs(TestDelegations):
         exp_calls = [(quoted[:-5], 1) for quoted in roles_to_filenames.values()]
         self.assertListEqual(self.sim.fetch_tracker.metadata, exp_calls)
 
-    hash_bins_graph: utils.DataSet = {
+    hash_bins_graph = {
         "delegations": DelegationsTestCase(
             delegations=[
                 TestDelegation(
@@ -432,7 +436,7 @@ class TestDelegationsGraphs(TestDelegations):
     # By setting the bit_length the total number of bins is 2^bit_length.
     # In each test case target_path is a path to a random target we want to
     # fetch and expected_target_bin is the bin we are expecting to visit.
-    succinct_bins_graph: utils.DataSet = {
+    succinct_bins_graph = {
         "bin amount = 2, taget bin index 0": SuccinctRolesTestCase(
             bit_length=1,
             target_path="boo",
@@ -544,7 +548,7 @@ class TestTargetFileSearch(TestDelegations):
         self._init_repo(self.delegations_tree)
 
     # fmt: off
-    targets: utils.DataSet = {
+    targets = {
         "no delegations":
             TargetTestCase("targetfile", True, []),
         "targetpath matches wildcard":
