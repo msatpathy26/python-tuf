@@ -114,7 +114,7 @@ class Repository(ABC):
         """Context manager for editing root metadata. See edit()"""
         with self.edit(Root.type) as root:
             if not isinstance(root, Root):
-                raise RuntimeError("Unexpected root type")
+                raise AssertionError("Unexpected root type")
             yield root
 
     @contextmanager
@@ -122,7 +122,7 @@ class Repository(ABC):
         """Context manager for editing timestamp metadata. See edit()"""
         with self.edit(Timestamp.type) as timestamp:
             if not isinstance(timestamp, Timestamp):
-                raise RuntimeError("Unexpected timestamp type")
+                raise AssertionError("Unexpected timestamp type")
             yield timestamp
 
     @contextmanager
@@ -130,7 +130,7 @@ class Repository(ABC):
         """Context manager for editing snapshot metadata. See edit()"""
         with self.edit(Snapshot.type) as snapshot:
             if not isinstance(snapshot, Snapshot):
-                raise RuntimeError("Unexpected snapshot type")
+                raise AssertionError("Unexpected snapshot type")
             yield snapshot
 
     @contextmanager
@@ -140,35 +140,35 @@ class Repository(ABC):
         """Context manager for editing targets metadata. See edit()"""
         with self.edit(rolename) as targets:
             if not isinstance(targets, Targets):
-                raise RuntimeError(f"Unexpected targets ({rolename}) type")
+                raise AssertionError(f"Unexpected targets ({rolename}) type")
             yield targets
 
     def root(self) -> Root:
         """Read current root metadata"""
         root = self.open(Root.type).signed
         if not isinstance(root, Root):
-            raise RuntimeError("Unexpected root type")
+            raise AssertionError("Unexpected root type")
         return root
 
     def timestamp(self) -> Timestamp:
         """Read current timestamp metadata"""
         timestamp = self.open(Timestamp.type).signed
         if not isinstance(timestamp, Timestamp):
-            raise RuntimeError("Unexpected timestamp type")
+            raise AssertionError("Unexpected timestamp type")
         return timestamp
 
     def snapshot(self) -> Snapshot:
         """Read current snapshot metadata"""
         snapshot = self.open(Snapshot.type).signed
         if not isinstance(snapshot, Snapshot):
-            raise RuntimeError("Unexpected snapshot type")
+            raise AssertionError("Unexpected snapshot type")
         return snapshot
 
     def targets(self, rolename: str = Targets.type) -> Targets:
         """Read current targets metadata"""
         targets = self.open(rolename).signed
         if not isinstance(targets, Targets):
-            raise RuntimeError("Unexpected targets type")
+            raise AssertionError("Unexpected targets type")
         return targets
 
     def do_snapshot(
