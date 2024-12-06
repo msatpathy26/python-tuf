@@ -37,19 +37,23 @@ downloads target files is available in `examples/client
 <https://github.com/theupdateframework/python-tuf/tree/develop/examples/client>`_.
 """
 
+from __future__ import annotations
+
 import contextlib
 import logging
 import os
 import shutil
 import tempfile
-from typing import Optional, cast
+from typing import TYPE_CHECKING, cast
 from urllib import parse
 
 from tuf.api import exceptions
 from tuf.api.metadata import Root, Snapshot, TargetFile, Targets, Timestamp
 from tuf.ngclient._internal import requests_fetcher, trusted_metadata_set
 from tuf.ngclient.config import EnvelopeType, UpdaterConfig
-from tuf.ngclient.fetcher import FetcherInterface
+
+if TYPE_CHECKING:
+    from tuf.ngclient.fetcher import FetcherInterface
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +84,10 @@ class Updater:
         self,
         metadata_dir: str,
         metadata_base_url: str,
-        target_dir: Optional[str] = None,
-        target_base_url: Optional[str] = None,
-        fetcher: Optional[FetcherInterface] = None,
-        config: Optional[UpdaterConfig] = None,
+        target_dir: str | None = None,
+        target_base_url: str | None = None,
+        fetcher: FetcherInterface | None = None,
+        config: UpdaterConfig | None = None,
     ):
         self._dir = metadata_dir
         self._metadata_base_url = _ensure_trailing_slash(metadata_base_url)
@@ -153,7 +157,7 @@ class Updater:
         filename = parse.quote(targetinfo.path, "")
         return os.path.join(self.target_dir, filename)
 
-    def get_targetinfo(self, target_path: str) -> Optional[TargetFile]:
+    def get_targetinfo(self, target_path: str) -> TargetFile | None:
         """Return ``TargetFile`` instance with information for ``target_path``.
 
         The return value can be used as an argument to
@@ -186,8 +190,8 @@ class Updater:
     def find_cached_target(
         self,
         targetinfo: TargetFile,
-        filepath: Optional[str] = None,
-    ) -> Optional[str]:
+        filepath: str | None = None,
+    ) -> str | None:
         """Check whether a local file is an up to date target.
 
         Args:
@@ -216,8 +220,8 @@ class Updater:
     def download_target(
         self,
         targetinfo: TargetFile,
-        filepath: Optional[str] = None,
-        target_base_url: Optional[str] = None,
+        filepath: str | None = None,
+        target_base_url: str | None = None,
     ) -> str:
         """Download the target file specified by ``targetinfo``.
 
@@ -275,7 +279,7 @@ class Updater:
         return filepath
 
     def _download_metadata(
-        self, rolename: str, length: int, version: Optional[int] = None
+        self, rolename: str, length: int, version: int | None = None
     ) -> bytes:
         """Download a metadata file and return it as bytes."""
         encoded_name = parse.quote(rolename, "")
@@ -292,7 +296,7 @@ class Updater:
 
     def _persist_metadata(self, rolename: str, data: bytes) -> None:
         """Write metadata to disk atomically to avoid data loss."""
-        temp_file_name: Optional[str] = None
+        temp_file_name: str | None = None
         try:
             # encode the rolename to avoid issues with e.g. path separators
             encoded_name = parse.quote(rolename, "")
@@ -420,7 +424,7 @@ class Updater:
 
     def _preorder_depth_first_walk(
         self, target_filepath: str
-    ) -> Optional[TargetFile]:
+    ) -> TargetFile | None:
         """
         Interrogates the tree of target delegations in order of appearance
         (which implicitly order trustworthiness), and returns the matching

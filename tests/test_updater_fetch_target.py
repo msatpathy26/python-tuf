@@ -66,7 +66,7 @@ class TestFetchTarget(unittest.TestCase):
             self.sim,
         )
 
-    targets: utils.DataSet = {
+    targets = {
         "standard case": TestTarget(
             path="targetpath",
             content=b"target content",

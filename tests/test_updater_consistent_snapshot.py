@@ -3,12 +3,13 @@
 
 """Test ngclient Updater toggling consistent snapshot"""
 
+from __future__ import annotations
+
 import os
 import sys
 import tempfile
 import unittest
-from collections.abc import Iterable
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from tests import utils
 from tests.repository_simulator import RepositorySimulator
@@ -21,6 +22,9 @@ from tuf.api.metadata import (
 )
 from tuf.ngclient import Updater
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 class TestConsistentSnapshot(unittest.TestCase):
     """Test different combinations of 'consistent_snapshot' and
@@ -28,7 +32,7 @@ class TestConsistentSnapshot(unittest.TestCase):
     are formed for each combination"""
 
     # set dump_dir to trigger repository state dumps
-    dump_dir: Optional[str] = None
+    dump_dir: str | None = None
 
     def setUp(self) -> None:
         self.subtest_count = 0
@@ -98,7 +102,7 @@ class TestConsistentSnapshot(unittest.TestCase):
         for filename in filenames:
             self.assertIn(filename, local_target_files)
 
-    top_level_roles_data: utils.DataSet = {
+    top_level_roles_data = {
         "consistent_snaphot disabled": {
             "consistent_snapshot": False,
             "calls": [
@@ -143,7 +147,7 @@ class TestConsistentSnapshot(unittest.TestCase):
         finally:
             self.teardown_subtest()
 
-    delegated_roles_data: utils.DataSet = {
+    delegated_roles_data = {
         "consistent_snaphot disabled": {
             "consistent_snapshot": False,
             "expected_version": None,
@@ -162,7 +166,7 @@ class TestConsistentSnapshot(unittest.TestCase):
         # the correct version prefix, depending on 'consistent_snapshot' config
         try:
             consistent_snapshot: bool = test_case_data["consistent_snapshot"]
-            exp_version: Optional[int] = test_case_data["expected_version"]
+            exp_version: int | None = test_case_data["expected_version"]
             rolenames = ["role1", "..", "."]
             exp_calls = [(role, exp_version) for role in rolenames]
 
@@ -190,7 +194,7 @@ class TestConsistentSnapshot(unittest.TestCase):
         finally:
             self.teardown_subtest()
 
-    targets_download_data: utils.DataSet = {
+    targets_download_data = {
         "consistent_snaphot disabled": {
             "consistent_snapshot": False,
             "prefix_targets": True,
@@ -219,7 +223,7 @@ class TestConsistentSnapshot(unittest.TestCase):
         try:
             consistent_snapshot: bool = test_case_data["consistent_snapshot"]
             prefix_targets_with_hash: bool = test_case_data["prefix_targets"]
-            hash_algo: Optional[str] = test_case_data["hash_algo"]
+            hash_algo: str | None = test_case_data["hash_algo"]
             targetpaths: list[str] = test_case_data["targetpaths"]
 
             self.setup_subtest(consistent_snapshot, prefix_targets_with_hash)

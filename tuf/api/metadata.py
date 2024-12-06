@@ -30,9 +30,11 @@ A basic example of repository implementation using the Metadata is available in
 `examples/repository <https://github.com/theupdateframework/python-tuf/tree/develop/examples/repository>`_.
 """
 
+from __future__ import annotations
+
 import logging
 import tempfile
-from typing import Any, Generic, Optional, cast
+from typing import TYPE_CHECKING, Any, Generic, cast
 
 from securesystemslib.signer import Signature, Signer
 from securesystemslib.storage import FilesystemBackend, StorageBackendInterface
@@ -65,11 +67,13 @@ from tuf.api._payload import (  # noqa: F401
     VerificationResult,
 )
 from tuf.api.exceptions import UnsignedMetadataError
-from tuf.api.serialization import (
-    MetadataDeserializer,
-    MetadataSerializer,
-    SignedSerializer,
-)
+
+if TYPE_CHECKING:
+    from tuf.api.serialization import (
+        MetadataDeserializer,
+        MetadataSerializer,
+        SignedSerializer,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -121,8 +125,8 @@ class Metadata(Generic[T]):
     def __init__(
         self,
         signed: T,
-        signatures: Optional[dict[str, Signature]] = None,
-        unrecognized_fields: Optional[dict[str, Any]] = None,
+        signatures: dict[str, Signature] | None = None,
+        unrecognized_fields: dict[str, Any] | None = None,
     ):
         self.signed: T = signed
         self.signatures = signatures if signatures is not None else {}
@@ -153,7 +157,7 @@ class Metadata(Generic[T]):
         return CanonicalJSONSerializer().serialize(self.signed)
 
     @classmethod
-    def from_dict(cls, metadata: dict[str, Any]) -> "Metadata[T]":
+    def from_dict(cls, metadata: dict[str, Any]) -> Metadata[T]:
         """Create ``Metadata`` object from its json/dict representation.
 
         Args:
@@ -205,9 +209,9 @@ class Metadata(Generic[T]):
     def from_file(
         cls,
         filename: str,
-        deserializer: Optional[MetadataDeserializer] = None,
-        storage_backend: Optional[StorageBackendInterface] = None,
-    ) -> "Metadata[T]":
+        deserializer: MetadataDeserializer | None = None,
+        storage_backend: StorageBackendInterface | None = None,
+    ) -> Metadata[T]:
         """Load TUF metadata from file storage.
 
         Args:
@@ -238,8 +242,8 @@ class Metadata(Generic[T]):
     def from_bytes(
         cls,
         data: bytes,
-        deserializer: Optional[MetadataDeserializer] = None,
-    ) -> "Metadata[T]":
+        deserializer: MetadataDeserializer | None = None,
+    ) -> Metadata[T]:
         """Load TUF metadata from raw data.
 
         Args:
@@ -263,9 +267,7 @@ class Metadata(Generic[T]):
 
         return deserializer.deserialize(data)
 
-    def to_bytes(
-        self, serializer: Optional[MetadataSerializer] = None
-    ) -> bytes:
+    def to_bytes(self, serializer: MetadataSerializer | None = None) -> bytes:
         """Return the serialized TUF file format as bytes.
 
         Note that if bytes are first deserialized into ``Metadata`` and then
@@ -306,8 +308,8 @@ class Metadata(Generic[T]):
     def to_file(
         self,
         filename: str,
-        serializer: Optional[MetadataSerializer] = None,
-        storage_backend: Optional[StorageBackendInterface] = None,
+        serializer: MetadataSerializer | None = None,
+        storage_backend: StorageBackendInterface | None = None,
     ) -> None:
         """Write TUF metadata to file storage.
 
@@ -345,7 +347,7 @@ class Metadata(Generic[T]):
         self,
         signer: Signer,
         append: bool = False,
-        signed_serializer: Optional[SignedSerializer] = None,
+        signed_serializer: SignedSerializer | None = None,
     ) -> Signature:
         """Create signature over ``signed`` and assigns it to ``signatures``.
 
@@ -388,8 +390,8 @@ class Metadata(Generic[T]):
     def verify_delegate(
         self,
         delegated_role: str,
-        delegated_metadata: "Metadata",
-        signed_serializer: Optional[SignedSerializer] = None,
+        delegated_metadata: Metadata,
+        signed_serializer: SignedSerializer | None = None,
     ) -> None:
         """Verify that ``delegated_metadata`` is signed with the required
         threshold of keys for ``delegated_role``.

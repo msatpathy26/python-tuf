@@ -1,5 +1,7 @@
 """Low-level TUF DSSE API. (experimental!)"""
 
+from __future__ import annotations
+
 import json
 from typing import Generic, cast
 
@@ -55,7 +57,7 @@ class SimpleEnvelope(Generic[T], BaseSimpleEnvelope):
     DEFAULT_PAYLOAD_TYPE = "application/vnd.tuf+json"
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> "SimpleEnvelope[T]":
+    def from_bytes(cls, data: bytes) -> SimpleEnvelope[T]:
         """Load envelope from JSON bytes.
 
         NOTE: Unlike ``tuf.api.metadata.Metadata.from_bytes``, this method
@@ -102,7 +104,7 @@ class SimpleEnvelope(Generic[T], BaseSimpleEnvelope):
         return json_bytes
 
     @classmethod
-    def from_signed(cls, signed: T) -> "SimpleEnvelope[T]":
+    def from_signed(cls, signed: T) -> SimpleEnvelope[T]:
         """Serialize payload as JSON bytes and wrap in envelope.
 
         Args:

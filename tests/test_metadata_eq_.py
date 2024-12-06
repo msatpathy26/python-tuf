@@ -3,6 +3,8 @@
 
 """Test __eq__ implementations of classes inside tuf/api/metadata.py."""
 
+from __future__ import annotations
+
 import copy
 import os
 import sys
@@ -63,7 +65,7 @@ class TestMetadataComparisions(unittest.TestCase):
 
     # Keys are class names.
     # Values are dictionaries containing attribute names and their new values.
-    classes_attributes_modifications: utils.DataSet = {
+    classes_attributes_modifications = {
         "Metadata": {"signed": None, "signatures": None},
         "Signed": {"version": -1, "spec_version": "0.0.0"},
         "Key": {"keyid": "a", "keytype": "foo", "scheme": "b", "keyval": "b"},

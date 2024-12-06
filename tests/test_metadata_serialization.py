@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 class TestSerialization(unittest.TestCase):
     """Test serialization for all classes in 'tuf/api/metadata.py'."""
 
-    invalid_metadata: utils.DataSet = {
+    invalid_metadata = {
         "no signatures field": b'{"signed": \
             { "_type": "timestamp", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
             "meta": {"snapshot.json": {"hashes": {"sha256" : "abc"}, "version": 1}}} \
@@ -55,7 +55,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises(DeserializationError):
             Metadata.from_bytes(test_data)
 
-    valid_metadata: utils.DataSet = {
+    valid_metadata = {
         "multiple signatures": b'{ \
             "signed": \
                 { "_type": "timestamp", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
@@ -90,7 +90,7 @@ class TestSerialization(unittest.TestCase):
 
         self.assertEqual(test_bytes, md.to_bytes())
 
-    invalid_signatures: utils.DataSet = {
+    invalid_signatures = {
         "missing keyid attribute in a signature": '{ "sig": "abc" }',
         "missing sig attribute in a signature": '{ "keyid": "id" }',
     }
@@ -101,7 +101,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises(KeyError):
             Signature.from_dict(case_dict)
 
-    valid_signatures: utils.DataSet = {
+    valid_signatures = {
         "all": '{ "keyid": "id", "sig": "b"}',
         "unrecognized fields": '{ "keyid": "id", "sig": "b", "foo": "bar"}',
     }
@@ -114,7 +114,7 @@ class TestSerialization(unittest.TestCase):
 
     # Snapshot instances with meta = {} are valid, but for a full valid
     # repository it's required that meta has at least one element inside it.
-    invalid_signed: utils.DataSet = {
+    invalid_signed = {
         "no _type": '{"spec_version": "1.0.0", "expires": "2030-01-01T00:00:00Z", "meta": {}}',
         "no spec_version": '{"_type": "snapshot", "version": 1, "expires": "2030-01-01T00:00:00Z", "meta": {}}',
         "no version": '{"_type": "snapshot", "spec_version": "1.0.0", "expires": "2030-01-01T00:00:00Z", "meta": {}}',
@@ -138,7 +138,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((KeyError, ValueError, TypeError)):
             Snapshot.from_dict(case_dict)
 
-    valid_keys: utils.DataSet = {
+    valid_keys = {
         "all": '{"keytype": "rsa", "scheme": "rsassa-pss-sha256", \
             "keyval": {"public": "foo"}}',
         "unrecognized field": '{"keytype": "rsa", "scheme": "rsassa-pss-sha256", \
@@ -153,7 +153,7 @@ class TestSerialization(unittest.TestCase):
         key = Key.from_dict("id", copy.copy(case_dict))
         self.assertDictEqual(case_dict, key.to_dict())
 
-    invalid_keys: utils.DataSet = {
+    invalid_keys = {
         "no keyid": '{"keytype": "rsa", "scheme": "rsassa-pss-sha256", "keyval": {"public": "abc"}}',
         "no keytype": '{"keyid": "id", "scheme": "rsassa-pss-sha256", "keyval": {"public": "foo"}}',
         "no scheme": '{"keyid": "id", "keytype": "rsa", "keyval": {"public": "foo"}}',
@@ -171,7 +171,7 @@ class TestSerialization(unittest.TestCase):
             keyid = case_dict.pop("keyid")
             Key.from_dict(keyid, case_dict)
 
-    invalid_roles: utils.DataSet = {
+    invalid_roles = {
         "no threshold": '{"keyids": ["keyid"]}',
         "no keyids": '{"threshold": 3}',
         "wrong threshold type": '{"keyids": ["keyid"], "threshold": "a"}',
@@ -186,7 +186,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((KeyError, TypeError, ValueError)):
             Role.from_dict(case_dict)
 
-    valid_roles: utils.DataSet = {
+    valid_roles = {
         "all": '{"keyids": ["keyid"], "threshold": 3}',
         "many keyids": '{"keyids": ["a", "b", "c", "d", "e"], "threshold": 1}',
         "ordered keyids": '{"keyids": ["c", "b", "a"], "threshold": 1}',
@@ -200,7 +200,7 @@ class TestSerialization(unittest.TestCase):
         role = Role.from_dict(copy.deepcopy(case_dict))
         self.assertDictEqual(case_dict, role.to_dict())
 
-    valid_roots: utils.DataSet = {
+    valid_roots = {
         "all": '{"_type": "root", "spec_version": "1.0.0", "version": 1, \
             "expires": "2030-01-01T00:00:00Z", "consistent_snapshot": false, \
             "keys": { \
@@ -248,7 +248,7 @@ class TestSerialization(unittest.TestCase):
         root = Root.from_dict(copy.deepcopy(case_dict))
         self.assertDictEqual(case_dict, root.to_dict())
 
-    invalid_roots: utils.DataSet = {
+    invalid_roots = {
         "invalid role name": '{"_type": "root", "spec_version": "1.0.0", "version": 1, \
             "expires": "2030-01-01T00:00:00Z", "consistent_snapshot": false, \
             "keys": { \
@@ -293,7 +293,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises(ValueError):
             Root.from_dict(case_dict)
 
-    invalid_metafiles: utils.DataSet = {
+    invalid_metafiles = {
         "wrong length type": '{"version": 1, "length": "a", "hashes": {"sha256" : "abc"}}',
         "version 0": '{"version": 0, "length": 1, "hashes": {"sha256" : "abc"}}',
         "length below 0": '{"version": 1, "length": -1, "hashes": {"sha256" : "abc"}}',
@@ -308,7 +308,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((TypeError, ValueError, AttributeError)):
             MetaFile.from_dict(case_dict)
 
-    valid_metafiles: utils.DataSet = {
+    valid_metafiles = {
         "all": '{"hashes": {"sha256" : "abc"}, "length": 12, "version": 1}',
         "no length": '{"hashes": {"sha256" : "abc"}, "version": 1 }',
         "length 0": '{"version": 1, "length": 0, "hashes": {"sha256" : "abc"}}',
@@ -323,7 +323,7 @@ class TestSerialization(unittest.TestCase):
         metafile = MetaFile.from_dict(copy.copy(case_dict))
         self.assertDictEqual(case_dict, metafile.to_dict())
 
-    invalid_timestamps: utils.DataSet = {
+    invalid_timestamps = {
         "no metafile": '{ "_type": "timestamp", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z"}',
     }
 
@@ -333,7 +333,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((ValueError, KeyError)):
             Timestamp.from_dict(case_dict)
 
-    valid_timestamps: utils.DataSet = {
+    valid_timestamps = {
         "all": '{ "_type": "timestamp", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
             "meta": {"snapshot.json": {"hashes": {"sha256" : "abc"}, "version": 1}}}',
         "legacy spec_version": '{ "_type": "timestamp", "spec_version": "1.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
@@ -348,7 +348,7 @@ class TestSerialization(unittest.TestCase):
         timestamp = Timestamp.from_dict(copy.deepcopy(case_dict))
         self.assertDictEqual(case_dict, timestamp.to_dict())
 
-    valid_snapshots: utils.DataSet = {
+    valid_snapshots = {
         "all": '{ "_type": "snapshot", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
             "meta": { \
                 "file1.txt": {"hashes": {"sha256" : "abc"}, "version": 1}, \
@@ -367,7 +367,7 @@ class TestSerialization(unittest.TestCase):
         snapshot = Snapshot.from_dict(copy.deepcopy(case_dict))
         self.assertDictEqual(case_dict, snapshot.to_dict())
 
-    valid_delegated_roles: utils.DataSet = {
+    valid_delegated_roles = {
         # DelegatedRole inherits Role and some use cases can be found in the valid_roles.
         "no hash prefix attribute": '{"keyids": ["keyid"], "name": "a", "paths": ["fn1", "fn2"], \
             "terminating": false, "threshold": 1}',
@@ -390,7 +390,7 @@ class TestSerialization(unittest.TestCase):
         deserialized_role = DelegatedRole.from_dict(copy.copy(case_dict))
         self.assertDictEqual(case_dict, deserialized_role.to_dict())
 
-    invalid_delegated_roles: utils.DataSet = {
+    invalid_delegated_roles = {
         # DelegatedRole inherits Role and some use cases can be found in the invalid_roles.
         "missing hash prefixes and paths": '{"name": "a", "keyids": ["keyid"], "threshold": 1, "terminating": false}',
         "both hash prefixes and paths": '{"name": "a", "keyids": ["keyid"], "threshold": 1, "terminating": false, \
@@ -409,7 +409,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises(ValueError):
             DelegatedRole.from_dict(case_dict)
 
-    valid_succinct_roles: utils.DataSet = {
+    valid_succinct_roles = {
         # SuccinctRoles inherits Role and some use cases can be found in the valid_roles.
         "standard succinct_roles information": '{"keyids": ["keyid"], "threshold": 1, \
             "bit_length": 8, "name_prefix": "foo"}',
@@ -423,7 +423,7 @@ class TestSerialization(unittest.TestCase):
         succinct_roles = SuccinctRoles.from_dict(copy.copy(case_dict))
         self.assertDictEqual(case_dict, succinct_roles.to_dict())
 
-    invalid_succinct_roles: utils.DataSet = {
+    invalid_succinct_roles = {
         # SuccinctRoles inherits Role and some use cases can be found in the invalid_roles.
         "missing bit_length from succinct_roles": '{"keyids": ["keyid"], "threshold": 1, "name_prefix": "foo"}',
         "missing name_prefix from succinct_roles": '{"keyids": ["keyid"], "threshold": 1, "bit_length": 8}',
@@ -439,7 +439,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((ValueError, KeyError, TypeError)):
             SuccinctRoles.from_dict(case_dict)
 
-    invalid_delegations: utils.DataSet = {
+    invalid_delegations = {
         "empty delegations": "{}",
         "missing keys": '{ "roles": [ \
                 {"keyids": ["keyid"], "name": "a", "terminating": true, "paths": ["fn1"], "threshold": 3}, \
@@ -507,7 +507,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises((ValueError, KeyError, AttributeError)):
             Delegations.from_dict(case_dict)
 
-    valid_delegations: utils.DataSet = {
+    valid_delegations = {
         "with roles": '{"keys": { \
                 "keyid1" : {"keytype": "rsa", "scheme": "rsassa-pss-sha256", "keyval": {"public": "foo"}}, \
                 "keyid2" : {"keytype": "ed25519", "scheme": "ed25519", "keyval": {"public": "bar"}}}, \
@@ -533,7 +533,7 @@ class TestSerialization(unittest.TestCase):
         delegation = Delegations.from_dict(copy.deepcopy(case_dict))
         self.assertDictEqual(case_dict, delegation.to_dict())
 
-    invalid_targetfiles: utils.DataSet = {
+    invalid_targetfiles = {
         "no hashes": '{"length": 1}',
         "no length": '{"hashes": {"sha256": "abc"}}',
         # The remaining cases are the same as for invalid_hashes and
@@ -548,7 +548,7 @@ class TestSerialization(unittest.TestCase):
         with self.assertRaises(KeyError):
             TargetFile.from_dict(case_dict, "file1.txt")
 
-    valid_targetfiles: utils.DataSet = {
+    valid_targetfiles = {
         "all": '{"length": 12, "hashes": {"sha256" : "abc"}, \
             "custom" : {"foo": "bar"} }',
         "no custom": '{"length": 12, "hashes": {"sha256" : "abc"}}',
@@ -562,7 +562,7 @@ class TestSerialization(unittest.TestCase):
         target_file = TargetFile.from_dict(copy.copy(case_dict), "file1.txt")
         self.assertDictEqual(case_dict, target_file.to_dict())
 
-    valid_targets: utils.DataSet = {
+    valid_targets = {
         "all attributes": '{"_type": "targets", "spec_version": "1.0.0", "version": 1, "expires": "2030-01-01T00:00:00Z", \
             "targets": { \
                 "file.txt": {"length": 12, "hashes": {"sha256" : "abc"} }, \
