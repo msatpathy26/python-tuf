@@ -1,0 +1,6 @@
+role: root
+dir: /tmp/keys
+size: 2048
+name: my_root_key1
+type: rsa
+password: False
